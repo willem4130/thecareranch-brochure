@@ -269,6 +269,28 @@
 
     <div class="version-list">
 
+      <a class="version" href="brochure-v11.html">
+        <div class="version-main">
+          <div class="version-header">
+            <span class="version-label">v11</span>
+            <span class="version-date">April 2026</span>
+          </div>
+          <p class="version-note">Brand font applied, scroll animations, PDF export, and responsive audit. Same content as v10 &mdash; byte-for-byte. This is the first version with motion: scroll down to see the sections fade and stagger in.</p>
+          <p class="version-pending">Still pending: individual team portraits (placeholder boxes with initials shown); Tara-removal on team group photo; expert-card format clarification.</p>
+          <span class="version-open">Open v11</span>
+        </div>
+        <div class="version-changes">
+          <span class="version-changes-label">What changed</span>
+          <ul>
+            <li><strong>Custom brand font</strong> (The Care Ranch) applied to all headings, kickers, drop caps, method numerals, and team initials via <code>@font-face</code>. Body copy and captions are now Arial. Google Fonts link removed.</li>
+            <li><strong>GSAP + ScrollTrigger + Lenis</strong> added via CDN for scroll-triggered animations: section headers fade up, method/team/benefit/journey/info/statement grids stagger their children, hero content fades up on load, hero background has a subtle parallax on scroll, Lenis provides smooth-scroll.</li>
+            <li><strong>Respects <code>prefers-reduced-motion</code></strong> &mdash; visitors with that OS setting see everything immediately with no motion.</li>
+            <li><strong>Download PDF button</strong> fixed in the bottom-right. Triggers <code>window.print()</code> with a dedicated print stylesheet that strips the hero background, stacks every grid to one column, forces page breaks at sections, preserves brand colors, and caps image heights so no single image dominates a page.</li>
+            <li><strong>Responsive audit and fixes</strong>: hero h1 no longer overflows at &lt;400px widths (letter-spacing and font size reduced), team card tablet layout uses <code>minmax(160px, 200px)</code> for the portrait column so it survives narrow tablets, drop cap scales down on mobile, journey step markers shrink on mobile, CTA button sizes down on mobile.</li>
+          </ul>
+        </div>
+      </a>
+
       <a class="version" href="brochure-v10.html">
         <div class="version-main">
           <div class="version-header">

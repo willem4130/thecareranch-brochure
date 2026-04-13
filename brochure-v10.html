@@ -218,6 +218,20 @@
 
     .split-text h2 { margin-bottom: 1.5rem; }
 
+    /* Arizona: full-width header row above the split for cleaner alignment */
+    .arizona-header {
+      max-width: 820px;
+      margin: 0 auto clamp(2.5rem, 5vw, 3.5rem);
+      text-align: center;
+    }
+    .arizona-header .kicker { display: block; }
+    .arizona-header .section-lead {
+      font-size: 1.08em;
+      color: var(--charcoal-soft);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
     .split-media {
       position: relative;
     }
@@ -296,7 +310,15 @@
       gap: clamp(0.75rem, 1.5vw, 1.15rem);
       margin-bottom: clamp(3rem, 5vw, 4rem);
     }
-    .method-photos img { width: 100%; border-radius: 2px; }
+    .method-photos img {
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+    .method-photos img:nth-child(3) {
+      object-position: 50% 78%;
+    }
 
     .method-grid {
       display: grid;
@@ -441,10 +463,9 @@
       margin-bottom: 0.9em;
     }
 
-    /* ═══════════════ Experience (sticky image right) ═══════════════ */
-    .experience-section .split-media img {
-      aspect-ratio: 3 / 4;
-      object-fit: cover;
+    /* ═══════════════ Experience (image left, text centered vertically) ═══════════════ */
+    .experience-section .split {
+      align-items: center;
     }
 
     /* ═══════════════ Journey — 3-column timeline ═══════════════ */
@@ -813,14 +834,16 @@
     </div>
   </header>
 
-  <!-- ═══════════════ Arizona (2-col split, image right) ═══════════════ -->
+  <!-- ═══════════════ Arizona (header full-width, body 2-col split) ═══════════════ -->
   <section class="section arizona-section">
     <div class="section-inner">
+      <div class="arizona-header">
+        <span class="kicker">Network &middot; Arizona</span>
+        <h2>The Care Ranch in Arizona</h2>
+        <p class="section-lead">The Care Ranch is an international network of retreat locations. Its flagship sits in Arizona. Wageningen, in the Netherlands, opens next &mdash; with further locations to follow.</p>
+      </div>
       <div class="split split-media-right">
         <div class="split-text">
-          <span class="kicker">Network &middot; Arizona</span>
-          <h2>The Care Ranch in Arizona</h2>
-          <p>The Care Ranch is an international network of retreat locations. Its flagship sits in Arizona. Wageningen, in the Netherlands, opens next &mdash; with further locations to follow.</p>
           <p class="drop-cap">Set in the high Sonoran Desert, the Arizona ranch collaborates with the historic Tubac Ranch &mdash; built in the 1800s &mdash; preserving its essence and partnership with nature.</p>
           <p>The ranch is restored with care, respect, and restraint, honoring the landscape and its historic charm.</p>
           <p>Nothing is excessive or distracting from the transformative journey.</p>

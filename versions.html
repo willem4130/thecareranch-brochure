@@ -269,6 +269,27 @@
 
     <div class="version-list">
 
+      <a class="version" href="brochure-v12.html">
+        <div class="version-main">
+          <div class="version-header">
+            <span class="version-label">v12</span>
+            <span class="version-date">April 2026</span>
+          </div>
+          <p class="version-note">Inline SVG logo replaces the hero text headline, plus word-by-word reveal animations on headings and poetic lines. Content, fonts, and colors unchanged from v11.</p>
+          <p class="version-pending">Still pending: individual team portraits, Tara-removal on team group photo, expert-card clarification.</p>
+          <span class="version-open">Open v12</span>
+        </div>
+        <div class="version-changes">
+          <span class="version-changes-label">What changed</span>
+          <ul>
+            <li><strong>Hero logo</strong> &mdash; the SVG logo is inlined into the hero h1, colored via CSS (<code>currentColor</code>) so it renders cream on the dark overlay. The big "THE CARE RANCH" text headline was removed because the logo already contains the wordmark; an accessibility-only <code>.visually-hidden</code> span preserves the h1 text for screen readers and SEO.</li>
+            <li><strong>Word-by-word scroll reveal</strong> added for: all section h2 headings, the Arizona section header, the empathetic opening line in Clean Vision ("There comes a point in leadership&hellip;"), the "The desert does not add anything. It removes." poetic line, and the Journey closing line ("Because transformation is not defined&hellip;"). Each word fades up with a 0.055s stagger when the element enters the viewport.</li>
+            <li>Implementation: ~30 lines of vanilla JS wraps each word in a <code>&lt;span class="word"&gt;</code> on load, GSAP <code>fromTo</code> animates them via ScrollTrigger. No new libraries &mdash; just GSAP and ScrollTrigger as in v11.</li>
+            <li><strong>No font, color, or layout changes</strong> from v11 &mdash; this round is strictly additive.</li>
+          </ul>
+        </div>
+      </a>
+
       <a class="version" href="brochure-v11.html">
         <div class="version-main">
           <div class="version-header">

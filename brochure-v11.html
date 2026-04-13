@@ -59,7 +59,7 @@
       --max-narrow: 720px;
     }
 
-    html { scroll-behavior: smooth; }
+    /* Native scroll — no smooth scroll, no Lenis. Fast and familiar. */
 
     body {
       font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
@@ -1110,10 +1110,9 @@
       }
     }
   </style>
-  <!-- Animation libraries (GSAP + ScrollTrigger + Lenis smooth scroll) -->
+  <!-- Animation libraries (GSAP + ScrollTrigger — no Lenis, native scroll is faster) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
 </head>
 <body>
 
@@ -1554,9 +1553,9 @@
     window.addEventListener('load', () => {
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // If the user prefers reduced motion, or libraries failed to load,
+      // If the user prefers reduced motion, or GSAP failed to load,
       // reveal all hidden elements immediately and bail.
-      if (reduceMotion || typeof gsap === 'undefined' || typeof Lenis === 'undefined' || typeof ScrollTrigger === 'undefined') {
+      if (reduceMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
         document.querySelectorAll(
           '.section-header, .arizona-header, .arizona-narrative, .split-text, .split-media, .method-footer, ' +
           '.cta-section .cta-quote, .cta-section h2, .cta-section .cta-button, .cta-section > .section-inner > .kicker, ' +
@@ -1566,24 +1565,8 @@
         return;
       }
 
-      // ─── Smooth scroll (Lenis) ───────────────────────────
-      const lenis = new Lenis({
-        duration: 1.15,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-      });
-
-      function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-      }
-      requestAnimationFrame(raf);
-
-      // ─── GSAP + ScrollTrigger ─────────────────────────────
+      // ─── GSAP + ScrollTrigger with native browser scroll ──
       gsap.registerPlugin(ScrollTrigger);
-      lenis.on('scroll', ScrollTrigger.update);
-      gsap.ticker.add((time) => lenis.raf(time * 1000));
-      gsap.ticker.lagSmoothing(0);
 
       const fadeUp = {
         opacity: 1,

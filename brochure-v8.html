@@ -494,6 +494,35 @@
       color: rgba(61, 54, 50, 0.28);
     }
 
+    /* ── Photos ── */
+    .section-photo {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: clamp(1.5rem, 4vw, 2.25rem) 0 clamp(2rem, 5vw, 2.75rem);
+    }
+
+    .inline-photo {
+      display: block;
+      width: 100%;
+      max-width: 520px;
+      height: auto;
+      margin: clamp(1.5rem, 4vw, 2rem) auto;
+    }
+
+    .photo-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(0.5rem, 1.5vw, 0.9rem);
+      margin: clamp(1.75rem, 4.5vw, 2.5rem) 0 clamp(2rem, 5vw, 2.75rem);
+    }
+
+    .photo-grid-3 img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 600px) {
       .hero { padding: clamp(3.5rem, 10vw, 5rem) 24px; }
@@ -504,6 +533,7 @@
       .full-bleed-inner-wide { padding-left: 20px; padding-right: 20px; }
       .method-item { padding-left: 16px; }
       .statement-list li { padding-left: 16px; }
+      .photo-grid-3 { grid-template-columns: 1fr; gap: 0.75rem; }
     }
   </style>
 </head>
@@ -524,6 +554,7 @@
     <section>
       <span class="kicker">Arizona</span>
       <h2>The Care Ranch in Arizona</h2>
+      <img class="section-photo" src="images/location-92.jpg" alt="The entrance to The Care Ranch at golden hour" />
       <p class="drop-cap">Set in the high Sonoran Desert of Arizona, The Care Ranch collaborates with the historic Tubac Ranch &mdash; built in the 1800s &mdash; preserving its essence and partnership with nature.</p>
       <p>The ranch is restored with care, respect, and restraint, honoring the landscape and its historic charm.</p>
       <p>Nothing is excessive or distracting from the transformative journey.</p>
@@ -534,6 +565,7 @@
 
       <p>Here, simplicity calms the nervous system while the absence of excess reduces cognitive load. This historic space slows perception and grounds the body. Nothing here is accidental.</p>
       <p>Food is prepared with care, using whole seasonal ingredients that support the nervous system and reflect the rhythm of the land.</p>
+      <img class="inline-photo" src="images/retreat-108.png" alt="A chef preparing food in the ranch kitchen" />
       <p>Nature is not a backdrop &mdash; it is an active force.</p>
       <p>It regulates. It slows perception. It brings back what is essential.</p>
       <p class="poetic">The desert does not add anything. It removes.</p>
@@ -582,6 +614,12 @@
         <p>We develop leadership by restoring alignment in the body and nervous system, allowing for clear perception and more precise decision-making.</p>
         <p>This is one integrated, multilayered approach &mdash; working through multiple entry points.</p>
 
+        <div class="photo-grid-3">
+          <img src="images/retreat-38.jpg" alt="Inner reflection work at the ranch" />
+          <img src="images/retreat-66.png" alt="Equine facilitated session with a horse" />
+          <img src="images/retreat-77.png" alt="Outdoor gathering under a desert ramada" />
+        </div>
+
         <div class="method-item">
           <strong>Movement and Body Alignment</strong>
           <p>Working with posture, coordination, and movement patterns to reorganize neuromuscular pathways and restore alignment between body and brain.</p>
@@ -626,6 +664,7 @@
     <section>
       <span class="kicker">Team</span>
       <h2>Our Team</h2>
+      <img class="section-photo" src="images/retreat-118.png" alt="The Care Ranch team" />
       <p>A multidisciplinary team working at the intersection of neuroscience, embodiment, nature, and leadership &mdash; led by a core team and supported by an extended network of practitioners and specialists.</p>
 
       <div class="bio">
@@ -665,6 +704,7 @@
     <section>
       <span class="kicker">Experience</span>
       <h2>The Experience</h2>
+      <img class="section-photo" src="images/location-51.jpg" alt="The pool at The Care Ranch with palm trees and mountain views" />
       <p>The experience unfolds over six days &mdash; a rhythm of activation and integration. Structured, yet spacious.</p>
       <p>Mornings begin in the body: movement, alignment, regulation. During the day, the work deepens &mdash; equine sessions, neuro-kinesiology, and coaching. Always alternating between experience, reflection, and integration.</p>
       <p>Late afternoons create space for reflection and sauna house experiences. Evenings settle under a sky filled with stars.</p>
@@ -680,6 +720,7 @@
     <section>
       <span class="kicker">Journey</span>
       <h2>The Journey</h2>
+      <img class="section-photo" src="images/retreat-85.png" alt="Participants walking through the desert trees" />
 
       <h3>Preparing for the Experience</h3>
       <p>The journey begins before arrival. Each participant starts with an intake questionnaire and session, exploring context, key questions, and underlying patterns.</p>

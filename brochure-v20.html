@@ -24,8 +24,6 @@
     @media (prefers-reduced-motion: no-preference) {
       .js .section-header,
       .js .arizona-header,
-      .js .split-text,
-      .js .split-media,
       .js .method-footer,
       .js .cta-section .cta-quote,
       .js .cta-section h2,
@@ -2310,7 +2308,7 @@
       // reveal all hidden elements immediately and bail.
       if (reduceMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
         document.querySelectorAll(
-          '.section-header, .arizona-header, .split-text, .split-media, .method-footer, ' +
+          '.section-header, .arizona-header, .method-footer, ' +
           '.cta-section .cta-quote, .cta-section h2, .cta-section .cta-button, .cta-section > .section-inner > .kicker, ' +
           '.method-grid > *, .method-photos > *, .team-grid > *, .benefits-grid > *, ' +
           '.journey-timeline > *, .info-grid > *, .statement-list > *'
@@ -2334,8 +2332,6 @@
       const singleSelectors = [
         '.section-header',
         '.arizona-header',
-        '.split-text',
-        '.split-media',
         '.method-footer',
         '.cta-section .cta-quote',
         '.cta-section h2',

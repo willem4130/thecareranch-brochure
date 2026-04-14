@@ -269,6 +269,39 @@
 
     <div class="version-list">
 
+      <a class="version" href="brochure-v20.html">
+        <div class="version-main">
+          <div class="version-header">
+            <span class="version-label">v20</span>
+            <span class="version-date">April 2026</span>
+          </div>
+          <p class="version-note">Client feedback pass. Hero redesign (black logo in the sky, tagline moved below), all orange kickers removed, Arizona intro-header dropped, unified TCR pull-out typography, Experience restructured to centered stack, Journey photo at natural aspect ratio, Book now popup replaces Connect-with-us, pricing added, em-dashes removed throughout.</p>
+          <p class="version-pending">Pending: individual team portraits, Tara-removal on team group photo, real Instagram handle, routing booking form to a real endpoint (currently mailto: contact@thecareranch.com).</p>
+          <span class="version-open">Open v20</span>
+        </div>
+        <div class="version-changes">
+          <span class="version-changes-label">What changed</span>
+          <ul>
+            <li><strong>Hero</strong>: logo rendered pure black, sitting in the sky portion of the entrance photo. The dark overlay was lightened so the ink reads against the image. The tagline moved out of the hero into a sand-colored band below, set in the Care Ranch font. A top-right utility row adds an Instagram icon + a Book now button.</li>
+            <li><strong>Orange text removed globally</strong>: all 12 section kickers deleted (Network Arizona, Vision, For You, Method, Team, Experience, Journey, Impact, Organizations, Mission, Details, Begin). Method-card numbers and journey step markers de-oranged. Only decorative accents (borders, dots, button hover) keep terracotta.</li>
+            <li><strong>Arizona</strong>: the "Network &middot; Arizona" kicker + "The Care Ranch in Arizona" heading + international-network intro paragraph all removed. The "Set in the high Sonoran Desert..." narrative is preserved and now opens the section; drop-cap "S" stripped; paragraphs center-aligned.</li>
+            <li><strong>Canonical TCR pull-out size</strong> established and documented: <code>clamp(1.4rem, 2.2vw, 1.85rem)</code>. Applied consistently to the hero tagline, every section opener (.poetic), inline quotes, shift-block, CTA quote, statement-list, and the chef-photo caption. A <code>.section-header p</code> override that was quietly stomping the .poetic size has been excluded.</li>
+            <li><strong>Method</strong>: photo order reassigned &mdash; Lotte (retreat-77) left, Scott (retreat-38) middle, horses (retreat-66) right. Retreat-77's specific crop tuned (<code>object-position: 50% 100%</code>) via a URL-based selector so future reorders don't detach the crop from the file. Method-card titles scaled down slightly relative to global h3.</li>
+            <li><strong>Team</strong>: placeholder portrait tiles (MM/SP/LvD) removed. Scott + Lotte bios swapped to match the team-banner order. Margreet's opener tweaked to "my firsthand executive experience". Names center-aligned and larger.</li>
+            <li><strong>Experience</strong>: 2-column split replaced with a centered stack &mdash; text at top, pool photo below at max 1100px for prominence. Body compressed from 5 short paragraphs to 2 flowing ones; opener in TCR italic.</li>
+            <li><strong>Journey</strong>: banner photo now renders at natural aspect ratio (was <code>object-fit: cover</code> capped at 420px). The closing line ("Because transformation is not defined...") moved out of the 3rd column and placed in a centered block below the timeline.</li>
+            <li><strong>What leaders gain</strong>: orange card borders removed. The 7th benefit ("A deeper connection to self and others") now spans both columns centered on its own row.</li>
+            <li><strong>Why this matters</strong>: bulleted list converted to a single comma-woven prose sentence. "Leaders return more coherent" moved to the bottom of the section.</li>
+            <li><strong>Who this is for</strong>: the "This brochure describes the experience designed for senior leaders..." paragraph removed entirely. "Whether the question is fully formed..." centered.</li>
+            <li><strong>Practical information</strong>: "Not included" card replaced with <strong>Price &mdash; USD 5,250 per person</strong>. "Includes" card converted from bulleted list to a small, centered, muted prose sentence.</li>
+            <li><strong>CTA</strong>: "Connect with us" renamed to <strong>Book now</strong> &mdash; opens a popup with Name, Email, and a pick-one-of-three date radio (Oct 28&ndash;Nov 2 shown but disabled as "Fully booked"). Submit crafts a prefilled mailto to contact@thecareranch.com. Instagram icon + label added below the button. "Where needed..." line converted to TCR italic, centered.</li>
+            <li><strong>36 em-dashes removed</strong> and replaced contextually: parens for parentheticals, colons before lists, semicolons for independent-clause pairs (keeps casing exactly), commas everywhere else. All other text byte-for-byte identical.</li>
+            <li><strong>Spacing tightened</strong>: section padding from <code>clamp(4rem, 9vw, 8rem)</code> to <code>clamp(3rem, 5.5vw, 5rem)</code> &mdash; roughly 30% less whitespace between sections.</li>
+            <li>Removed: footer version text and the fixed "Download PDF" button.</li>
+          </ul>
+        </div>
+      </a>
+
       <a class="version" href="brochure-v12.html">
         <div class="version-main">
           <div class="version-header">

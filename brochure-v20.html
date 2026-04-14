@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Care Ranch Brochure</title>
+  <script>document.documentElement.classList.add('js');</script>
   <style>
     /* ═══════════════ Custom brand font (The Care Ranch) ═══════════════ */
     @font-face {
@@ -16,6 +17,49 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ═══════════════ Animation: FOUC prevention ═══════════════
+       Hide elements that will be animated in via GSAP only when JS
+       is enabled, so non-JS visitors still see everything. */
+    @media (prefers-reduced-motion: no-preference) {
+      .js .section-header,
+      .js .arizona-header,
+      .js .split-text,
+      .js .split-media,
+      .js .method-footer,
+      .js .cta-section .cta-quote,
+      .js .cta-section h2,
+      .js .cta-section .cta-button,
+      .js .cta-section > .section-inner > .kicker,
+      .js .method-grid > *,
+      .js .method-photos > *,
+      .js .team-grid > *,
+      .js .benefits-grid > *,
+      .js .journey-timeline > *,
+      .js .info-grid > *,
+      .js .statement-list > * {
+        opacity: 0;
+      }
+      /* Word-split targets — hide before JS splits them */
+      .js .section-header h2,
+      .js .arizona-header h2,
+      .js [data-split] {
+        opacity: 0;
+      }
+      /* Once JS has split and wrapped words, reveal the parent —
+         individual words are now responsible for their own opacity */
+      .js .section-header h2.split-ready,
+      .js .arizona-header h2.split-ready,
+      .js [data-split].split-ready {
+        opacity: 1;
+      }
+    }
+
+    /* Word span (created dynamically by splitWords JS) */
+    .word {
+      display: inline-block;
+      will-change: opacity, transform;
+    }
 
     :root {
       --sand:       #F7F4F0;
@@ -1373,6 +1417,9 @@
       }
     }
   </style>
+  <!-- Animation libraries (GSAP + ScrollTrigger — no Lenis, native scroll is faster) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 </head>
 <body>
 
@@ -2255,5 +2302,150 @@
   </script>
 
   <!-- ═══════════════ Animation init ═══════════════ -->
+  <script>
+    window.addEventListener('load', () => {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // If the user prefers reduced motion, or GSAP failed to load,
+      // reveal all hidden elements immediately and bail.
+      if (reduceMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        document.querySelectorAll(
+          '.section-header, .arizona-header, .split-text, .split-media, .method-footer, ' +
+          '.cta-section .cta-quote, .cta-section h2, .cta-section .cta-button, .cta-section > .section-inner > .kicker, ' +
+          '.method-grid > *, .method-photos > *, .team-grid > *, .benefits-grid > *, ' +
+          '.journey-timeline > *, .info-grid > *, .statement-list > *'
+        ).forEach((el) => { el.style.opacity = 1; });
+        return;
+      }
+
+      // ─── GSAP + ScrollTrigger with native browser scroll ──
+      gsap.registerPlugin(ScrollTrigger);
+
+      const fadeUp = {
+        opacity: 1,
+        y: 0,
+        duration: 0.95,
+        ease: 'power2.out',
+      };
+      const fadeUpStart = { opacity: 0, y: 32 };
+      const fadeUpStartSmall = { opacity: 0, y: 22 };
+
+      // ─── Single-element reveals ───────────────────────────
+      const singleSelectors = [
+        '.section-header',
+        '.arizona-header',
+        '.split-text',
+        '.split-media',
+        '.method-footer',
+        '.cta-section .cta-quote',
+        '.cta-section h2',
+        '.cta-section .cta-button',
+        '.cta-section > .section-inner > .kicker',
+      ];
+
+      singleSelectors.forEach((selector) => {
+        gsap.utils.toArray(selector).forEach((el) => {
+          gsap.fromTo(el, fadeUpStart, {
+            ...fadeUp,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+            },
+          });
+        });
+      });
+
+      // ─── Staggered children ──────────────────────────────
+      const staggerConfigs = [
+        { selector: '.method-photos', stagger: 0.1, start: fadeUpStartSmall },
+        { selector: '.method-grid', stagger: 0.1, start: fadeUpStartSmall },
+        { selector: '.team-grid', stagger: 0.14, start: fadeUpStart },
+        { selector: '.benefits-grid', stagger: 0.08, start: fadeUpStartSmall },
+        { selector: '.journey-timeline', stagger: 0.18, start: fadeUpStart },
+        { selector: '.info-grid', stagger: 0.08, start: fadeUpStartSmall },
+        { selector: '.statement-list', stagger: 0.07, start: fadeUpStartSmall },
+      ];
+
+      staggerConfigs.forEach(({ selector, stagger, start }) => {
+        const container = document.querySelector(selector);
+        if (!container) return;
+        const children = Array.from(container.children);
+        gsap.fromTo(children, start, {
+          ...fadeUp,
+          stagger,
+          scrollTrigger: {
+            trigger: container,
+            start: 'top 82%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+
+      // ─── Subtle parallax on hero background ──────────────
+      gsap.to('.hero', {
+        backgroundPosition: 'center 80%',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        },
+      });
+
+      // ─── Hero content subtle fade-up on load ─────────────
+      gsap.from('.hero-logo, .hero .tagline, .hero-divider', {
+        opacity: 0,
+        y: 28,
+        duration: 1.1,
+        ease: 'power2.out',
+        stagger: 0.22,
+        delay: 0.3,
+      });
+
+      // ─── Word-by-word reveal on scroll ───────────────────
+      // Split each target element's text into <span class="word"> elements,
+      // then animate them with a tight stagger on ScrollTrigger.
+      function splitWords(el) {
+        // Only consider direct text nodes — preserve any nested tags.
+        const original = el.textContent.trim().replace(/\s+/g, ' ');
+        const words = original.split(' ');
+        el.innerHTML = words
+          .map((w) => '<span class="word">' + w + '</span>')
+          .join(' ');
+        el.classList.add('split-ready');
+      }
+
+      const splitTargets = [
+        ...document.querySelectorAll('.section-header h2'),
+        ...document.querySelectorAll('.arizona-header h2'),
+        ...document.querySelectorAll('[data-split]'),
+      ];
+
+      splitTargets.forEach((el) => {
+        splitWords(el);
+        const words = el.querySelectorAll('.word');
+        if (!words.length) return;
+        gsap.fromTo(
+          words,
+          { opacity: 0, y: 18 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power2.out',
+            stagger: 0.055,
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            },
+          },
+        );
+      });
+    });
+  </script>
+
 </body>
 </html>

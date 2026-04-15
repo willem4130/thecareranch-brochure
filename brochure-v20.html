@@ -1056,6 +1056,43 @@
       transition: background 0.25s ease;
     }
     .booking-submit:hover { background: var(--terracotta); border-color: var(--terracotta); }
+    .booking-submit[disabled] {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background: var(--charcoal);
+      border-color: var(--charcoal);
+    }
+    .booking-error {
+      margin: 6px 0 0;
+      padding: 11px 14px;
+      background: rgba(196, 125, 92, 0.09);
+      border: 1px solid rgba(196, 125, 92, 0.35);
+      border-radius: 2px;
+      color: var(--charcoal);
+      font-family: Arial, sans-serif;
+      font-size: 0.9em;
+      line-height: 1.55;
+    }
+    .booking-error a { color: var(--terracotta); text-decoration: underline; }
+    .booking-success {
+      text-align: center;
+      padding: 0.5rem 0 0;
+    }
+    .booking-success h4 {
+      font-family: 'The Care Ranch', Georgia, serif;
+      font-weight: 400;
+      font-style: italic;
+      font-size: clamp(1.6rem, 2.8vw, 2rem);
+      color: var(--charcoal);
+      margin-bottom: 0.85rem;
+      line-height: 1.2;
+    }
+    .booking-success p {
+      font-family: Arial, sans-serif;
+      color: var(--charcoal);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
 
     /* ═══════════════ Footer ═══════════════ */
     footer {
@@ -2242,8 +2279,14 @@
             <span>October 28 &ndash; November 2, 2026 <em>(Fully booked)</em></span>
           </label>
         </fieldset>
+        <div class="booking-error" id="bookingError" hidden></div>
         <button type="submit" class="booking-submit">Send request</button>
       </form>
+      <div class="booking-success" id="bookingSuccess" hidden>
+        <h4>Thank you, <span id="bookingSuccessName"></span>.</h4>
+        <p>We&rsquo;ve received your booking request and will be in touch within 48 hours to confirm your place.</p>
+        <button type="button" class="booking-submit" data-close-booking>Close</button>
+      </div>
     </div>
   </div>
 
@@ -2263,10 +2306,31 @@
         const first = modal.querySelector('input[name="name"]');
         if (first) setTimeout(() => first.focus(), 30);
       }
+      const errorEl = document.getElementById('bookingError');
+      const successEl = document.getElementById('bookingSuccess');
+      const successNameEl = document.getElementById('bookingSuccessName');
+      const submitBtn = form ? form.querySelector('.booking-submit') : null;
+      const submitBtnLabel = submitBtn ? submitBtn.textContent : 'Send request';
+
+      function resetModalState() {
+        if (!form) return;
+        form.hidden = false;
+        form.reset();
+        if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
+        if (successEl) successEl.hidden = true;
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitBtnLabel; }
+      }
+      function showError(html) {
+        if (!errorEl) return;
+        errorEl.innerHTML = html;
+        errorEl.hidden = false;
+      }
+
       function close() {
         modal.hidden = true;
         modal.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
+        resetModalState();
       }
       openers.forEach(btn => btn.addEventListener('click', (e) => { e.preventDefault(); open(); }));
       closers.forEach(btn => btn.addEventListener('click', close));
@@ -2275,25 +2339,41 @@
       });
 
       if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
           e.preventDefault();
+          if (errorEl) { errorEl.hidden = true; errorEl.textContent = ''; }
           const fd = new FormData(form);
           const name = (fd.get('name') || '').toString().trim();
           const email = (fd.get('email') || '').toString().trim();
           const date = (fd.get('date') || '').toString();
-          const subject = encodeURIComponent('Retreat booking request — ' + date);
-          const bodyLines = [
-            'Hello,',
-            '',
-            'I would like to book a place on the retreat:',
-            '',
-            '  Date: ' + date,
-            '  Name: ' + name,
-            '  Email: ' + email,
-            '',
-            'Thank you.'
-          ].join('\n');
-          window.location.href = 'mailto:contact@thecareranch.com?subject=' + subject + '&body=' + encodeURIComponent(bodyLines);
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Sending\u2026';
+
+          try {
+            const res = await fetch('/api/book', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, email, date }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (res.ok && data && data.ok) {
+              form.hidden = true;
+              if (successNameEl) successNameEl.textContent = name;
+              if (successEl) successEl.hidden = false;
+            } else {
+              showError(
+                'Something went wrong on our end. Please email us at <a href="mailto:contact@thecareranch.com">contact@thecareranch.com</a> and we&rsquo;ll get back to you.'
+              );
+            }
+          } catch (err) {
+            showError(
+              'Could not reach the server. Please email us at <a href="mailto:contact@thecareranch.com">contact@thecareranch.com</a>.'
+            );
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtnLabel;
+          }
         });
       }
     })();

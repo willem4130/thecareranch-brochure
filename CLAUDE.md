@@ -3,7 +3,7 @@
 ## What this is
 An evolving set of HTML brochure drafts for The Care Ranch, deployed via Cloudflare Pages. The client reviews and compares drafts through a `versions.html` index page that lists every version with a changelog. **v20 is the current active draft** (content + type treatment pass).
 
-The booking form on v20 is wired to a real email pipeline: a Cloudflare Pages Function (`functions/api/book.js`) calls the Resend API on submit. Details in the "Booking form + email" section below.
+The booking form on v20 is wired to a real email pipeline: a Cloudflare Pages Function (`functions/api/book.js`) forwards the booking through FormSubmit (Resend was the previous backend; Web3Forms swap is pending). Details in the "Booking form + email" section below.
 
 Also contains the original v7 feedback and legacy .docx tooling from earlier rounds.
 
@@ -25,7 +25,10 @@ Also contains the original v7 feedback and legacy .docx tooling from earlier rou
 │   ├── retreat-77.png               # Lotte — ramada session → Method band LEFT (cropped via object-position: 50% 100%)
 │   ├── retreat-85.png               # Walking in trees → Journey banner
 │   ├── retreat-108.png              # Food → Arizona section
-│   └── retreat-118.png              # Team group photo → Team section
+│   ├── retreat-118.png              # Team group photo → Team section
+│   ├── rooms-bedroom.png            # Bedroom → Practical Info thumbnail row (above Includes)
+│   ├── rooms-chair.png              # Chair detail → Practical Info thumbnail row
+│   └── rooms-window.png             # Night window → Practical Info thumbnail row
 ├── client-input/
 │   ├── brochure-v7-original.docx    # Original brochure from the client
 │   └── v9/                          # Screenshots + transcription for v9 input
@@ -37,7 +40,7 @@ Also contains the original v7 feedback and legacy .docx tooling from earlier rou
 │   └── generate_brochure_v8.py      # Legacy — only used for v8 round
 ├── functions/
 │   └── api/
-│       └── book.js                  # Cloudflare Pages Function: POST /api/book → Resend
+│       └── book.js                  # Cloudflare Pages Function: POST /api/book → FormSubmit (Web3Forms swap pending)
 ├── .references/
 │   └── voice.md                     # WB-copywriter voice profile derived from v20 + CLAUDE.md rules
 ├── content/
@@ -93,21 +96,35 @@ GitHub repo operations use `gh` (authenticated as `willem4130`).
 
 ## Booking form + email
 
-The "Book now" button opens a modal form. On submit, the form POSTs JSON to `/api/book`, handled by `functions/api/book.js` (a Cloudflare Pages Function). That function validates input and calls the Resend API to send a notification email.
+The "Book now" button opens a modal form. On submit, the form POSTs JSON to `/api/book`, handled by `functions/api/book.js` (a Cloudflare Pages Function). That function validates input and forwards the booking through a third-party email relay. Which relay has been in flux (Resend → FormSubmit → Web3Forms planned). Current on `main` = FormSubmit.
 
-**Flow:** browser form → `fetch` POST `/api/book` → `functions/api/book.js` → Resend API → email lands.
+**Flow:** browser form → `fetch` POST `/api/book` → `functions/api/book.js` → FormSubmit AJAX endpoint → email lands at both `willem@scex.nl` and `contact@thecareranch.com`.
 
-**Env var:** `RESEND_API_KEY` is stored as a Cloudflare Pages secret (encrypted, never in the repo). Set or rotate via `npx wrangler pages secret put RESEND_API_KEY --project-name=thecareranch-brochure` (interactive; paste at prompt). The function reads it as `env.RESEND_API_KEY`. Pages Functions need a fresh deployment after a new secret is set, so follow any `secret put` with an empty commit + push to retrigger a build.
+**Why the swap off Resend (2026-04-15):** Resend's sandbox restricted sending to the account owner's email (`willem@scex.nl`) until `thecareranch.com` domain was verified. DNS access on that domain wasn't coming soon, so the path forward became "use a relay that doesn't need DNS on the sender domain."
 
-**Current sender:** `onboarding@resend.dev` (Resend's shared sandbox sender). `reply_to` is set to the booker's email so a reply goes back to the guest directly from whoever opens the notification.
+**Why FormSubmit:** zero DNS, no sender address to maintain (relay sends from its own domain), free, and `_cc` natively supports the second recipient. Full POST body to `https://formsubmit.co/ajax/willem@scex.nl` includes `_cc`, `_replyto`, `_subject`, `_template: table`, `_captcha: false`, plus the form fields (Date, Name, Email).
 
-**Current recipients:** `willem@scex.nl` only. Resend's sandbox blocks unverified accounts from sending to any address other than the account owner's. `contact@thecareranch.com` is intentionally NOT in the recipient list until the domain is verified (see Pending). The email `to` list lives in the `RECIPIENTS` constant at the top of `functions/api/book.js`.
+**Gotcha — Origin/Referer headers are load-bearing.** FormSubmit's AJAX endpoint rejects server-to-server requests without browser-like `Origin` and `Referer` headers (returns `"Make sure you open this page through a web server..."`). Cloudflare Workers' `fetch` does not send these by default, so `book.js` explicitly sets them from `new URL(request.url).origin`. Do not remove these lines.
+
+**Open issue — FormSubmit deployed but unconfirmed working.** First submission should trigger a one-time activation email per recipient. API returns `{success: "true", message: "... We've sent you an email ..."}` on test submissions, but neither `willem@scex.nl` nor `contact@thecareranch.com` reported receiving the activation email (spam checked). Status as of 2026-04-15: pipeline accepts submissions without error, but we cannot confirm FormSubmit is actually delivering. This is why the Web3Forms swap is planned.
+
+**Web3Forms swap (pending user action — primary blocker):**
+  1. User signs up at https://web3forms.com/ with any email, receives an `access_key` (UUID) by email
+  2. Store as Cloudflare Pages secret: `npx wrangler pages secret put WEB3FORMS_ACCESS_KEY --project-name=thecareranch-brochure`
+  3. Rewrite the fetch in `functions/api/book.js` to POST JSON to `https://api.web3forms.com/submit` with `{access_key: env.WEB3FORMS_ACCESS_KEY, subject, from_name, name, email, date, cc: "contact@thecareranch.com", reply_to: email}`
+  4. Remove the `Origin` / `Referer` header workaround (Web3Forms uses token-based auth, no browser-header sniffing)
+  5. Empty commit + push to retrigger the build so the function sees the new secret
+  Rationale: Web3Forms uses an access_key token, so it's reliable for serverless calls. 250 submissions/month free. Same zero-DNS, same multi-recipient via `cc`.
+
+**Dormant state on Cloudflare:** `RESEND_API_KEY` secret still exists but is no longer read by the function. Harmless; can be deleted via `npx wrangler pages secret delete RESEND_API_KEY --project-name=thecareranch-brochure` or left as-is.
+
+**Frontend contract (stays the same across any relay swap):** POST `/api/book` with JSON `{name, email, date}` → returns `{ok: true}` on success or `{ok: false, error: "..."}` on failure. This contract keeps the HTML modal in `brochure-v20.html` decoupled from whichever relay is being used.
 
 **Success / error UX:** On successful POST, the modal swaps to a "Thank you, {name}. We've received your booking request..." state. On error (network failure or non-2xx from the function), the modal shows an inline message with a fallback mailto to `contact@thecareranch.com`. State resets on modal close so a reopen is always fresh.
 
-**Drafted email templates:** `content/email-booking-notification-2026-04-14.md` contains two brand-voiced HTML + plain-text templates (Concierge slip + Landed letter) generated by `/WB-copywriter`. Both use the Care Ranch palette via inline styles with table-based layout for Outlook compatibility. They are NOT wired yet: the Concierge slip would replace the current plain-text internal notification; the Landed letter is the booker-facing confirmation, which requires domain verification before it can be sent (see Pending). Once unblocked, swap the `text:` field in the Resend call for `html:` plus `text:` and add the template substitutions.
+**Drafted email templates (currently unused):** `content/email-booking-notification-2026-04-14.md` contains two brand-voiced HTML + plain-text templates (Concierge slip + Landed letter) generated by `/WB-copywriter`. These were designed for direct-send APIs (like Resend). Under FormSubmit / Web3Forms, the relay composes its own email body from the POST fields, so the templates aren't wired. Kept for if the project ever moves back to a direct-send API once DNS is available.
 
-**Public contact address in the brochure:** `contact@thecareranch.com` is linked inline at the CTA's `.cta-fine` line (centered block, Arial, terracotta underline) and in the new `<footer>` (`.footer-contact`). Same address appears as the `reply_to` on notification emails, so pre-booking questions, post-booking replies, and the "if something went wrong" fallback all converge on one inbox.
+**Public contact address in the brochure:** `contact@thecareranch.com` is linked inline at the CTA's `.cta-fine` line (centered block, Arial, terracotta underline) and in the `<footer>` (`.footer-contact`). Now that it's a real `_cc` recipient on FormSubmit, pre-booking questions, post-booking replies, and internal notifications all converge on that inbox.
 
 ## .docx generation (legacy — v8 only)
 The `scripts/generate_brochure_v8.py` script was used in the v8 round to produce a Word doc alongside the HTML. Not used for v9+. Kept for reference.
@@ -136,8 +153,8 @@ The original (Google Docs export) stores formatting as paragraph- and run-level 
   - **TCR pull-out size (canonical, v20+):** `clamp(1.4rem, 2.2vw, 1.85rem)` — ~22–30px. This applies to EVERY TCR italic pull-out across the brochure: section openers below an h2 (`.poetic`), inline quotes (`.inline-quote p`), hero tagline (`.hero-tagline`), interstitial pull-outs (`.shift-block`), CTA quote (`.cta-quote`), and statement list items (`.statement-list li`). Consistency across these is required — a brochure reads as one document, so if you change one, change them all. Do NOT introduce a new size without asking.
 - **Landing page fonts (reference project only):** Playfair Display + Lora via Google Fonts
 
-## Pending (as of v20)
-- Individual team portraits: placeholder tiles gone in v20; real portraits still awaited
-- Tara-removal AI edit on the team group photo (`retreat-118`)
-- **Resend domain verification for `thecareranch.com`**: unlocks sending to `contact@thecareranch.com` and to arbitrary booker addresses. Requires 3 DNS records on the client's domain (SPF + DKIM + DMARC). Once verified: (a) add `contact@thecareranch.com` back to the `RECIPIENTS` list in `functions/api/book.js`, (b) wire the "Landed letter" template from `content/email-booking-notification-*.md` as a second Resend call sent to the booker's email as a confirmation, (c) swap sender from `onboarding@resend.dev` to a branded address like `bookings@thecareranch.com`.
-- Fonts: the original focus of the session that spawned this whole Cloudflare/Resend deployment was to fine-tune the brochure typography. That work is still untouched.
+## Pending (as of 2026-04-15)
+- **Web3Forms access key + swap** (primary blocker on reliable booking email delivery): user signs up at web3forms.com, receives `access_key`, pastes. Then store as Cloudflare Pages secret + rewrite the POST in `functions/api/book.js`. Full steps in "Booking form + email" section above.
+- **Team group photo edits** (`retreat-118.png`): user is editing in Freepik — removing Tara and obfuscating the face of the person lying down. Will drop the edited file back in place; brochure picks it up automatically, no code change.
+- **Individual team portraits**: placeholder tiles gone in v20; real portraits still awaited from the client.
+- **Fonts — ON HOLD**: the original session goal (type fine-tuning) is paused per the user. Do NOT propose a font pass proactively. Only resume if the client's feedback explicitly raises typography.

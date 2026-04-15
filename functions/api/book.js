@@ -27,6 +27,7 @@ export async function onRequestPost({ request }) {
     return json({ ok: false, error: 'Please select a valid date' }, 400);
   }
 
+  const origin = new URL(request.url).origin;
   const formSubmitResponse = await fetch(
     `https://formsubmit.co/ajax/${encodeURIComponent(PRIMARY_RECIPIENT)}`,
     {
@@ -34,6 +35,8 @@ export async function onRequestPost({ request }) {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        Origin: origin,
+        Referer: origin + '/',
       },
       body: JSON.stringify({
         _subject: `Retreat booking request, ${date}`,

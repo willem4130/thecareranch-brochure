@@ -873,6 +873,22 @@
       color: rgba(242, 237, 228, 0.75);
       text-align: center;
     }
+    .cta-fine a {
+      font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+      font-style: normal;
+      font-size: 0.82em;
+      letter-spacing: 0.02em;
+      color: rgba(242, 237, 228, 0.92);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(196, 125, 92, 0.55);
+      padding-bottom: 1px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+    .cta-fine a:hover {
+      color: var(--terracotta);
+      border-bottom-color: var(--terracotta);
+    }
 
     .cta-insta {
       display: inline-flex;
@@ -1113,6 +1129,26 @@
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: rgba(61, 54, 50, 0.32);
+    }
+
+    .footer-contact {
+      text-align: center;
+      font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      color: rgba(61, 54, 50, 0.65);
+      margin: 0;
+    }
+    .footer-contact a {
+      color: var(--charcoal);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(196, 125, 92, 0.45);
+      padding-bottom: 1px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .footer-contact a:hover {
+      color: var(--terracotta);
+      border-bottom-color: var(--terracotta);
     }
 
     /* ═══════════════ Responsive ═══════════════ */
@@ -2240,13 +2276,21 @@
       <h2>Begin Your Journey</h2>
       <p>Program dates, pricing, and availability are listed on the website. Participation is limited and based on application.</p>
       <button class="cta-button" type="button" data-open-booking>Book now</button>
-      <p class="cta-fine">Where needed, we are happy to connect briefly to explore alignment and answer any questions.</p>
+      <p class="cta-fine">Where needed, we are happy to connect briefly to explore alignment and answer any questions: <a href="mailto:contact@thecareranch.com">contact@thecareranch.com</a>.</p>
       <a class="cta-insta" href="https://instagram.com/thecareranch" target="_blank" rel="noopener" aria-label="Follow The Care Ranch on Instagram">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.42.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.42 2.22.06 1.26.07 1.64.07 4.85 0 3.2-.01 3.58-.07 4.84-.06 1.17-.26 1.8-.42 2.23a3.7 3.7 0 0 1-.9 1.38 3.7 3.7 0 0 1-1.38.9c-.42.16-1.06.36-2.23.42-1.26.06-1.64.07-4.85.07-3.2 0-3.58-.01-4.84-.07-1.17-.06-1.8-.26-2.23-.42a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.42-2.23C2.2 15.6 2.2 15.2 2.2 12c0-3.2 0-3.6.07-4.85.05-1.17.25-1.8.42-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.42C8.4 2.2 8.8 2.2 12 2.2zm0 1.95c-3.15 0-3.52 0-4.76.07-1.08.05-1.66.23-2.05.38-.51.2-.88.44-1.27.83a3.4 3.4 0 0 0-.83 1.27c-.15.39-.33.97-.38 2.05-.07 1.24-.07 1.6-.07 4.76s0 3.52.07 4.76c.05 1.08.23 1.66.38 2.05.2.51.44.88.83 1.27.39.39.76.63 1.27.83.39.15.97.33 2.05.38 1.24.07 1.6.07 4.76.07s3.52 0 4.76-.07c1.08-.05 1.66-.23 2.05-.38.51-.2.88-.44 1.27-.83.39-.39.63-.76.83-1.27.15-.39.33-.97.38-2.05.07-1.24.07-1.6.07-4.76s0-3.52-.07-4.76c-.05-1.08-.23-1.66-.38-2.05a3.4 3.4 0 0 0-.83-1.27 3.4 3.4 0 0 0-1.27-.83c-.39-.15-.97-.33-2.05-.38-1.24-.07-1.6-.07-4.76-.07zm0 3.32a4.53 4.53 0 1 1 0 9.06 4.53 4.53 0 0 1 0-9.06zm0 1.95a2.58 2.58 0 1 0 0 5.16 2.58 2.58 0 0 0 0-5.16zm5.78-2.17a1.06 1.06 0 1 1-2.12 0 1.06 1.06 0 0 1 2.12 0z"/></svg>
         <span>Follow us on Instagram</span>
       </a>
     </div>
   </section>
+
+  <!-- ═══════════════ Footer ═══════════════ -->
+  <footer>
+    <div class="footer-gradient"></div>
+    <p class="footer-contact">
+      <a href="mailto:contact@thecareranch.com">contact@thecareranch.com</a>
+    </p>
+  </footer>
 
   <!-- ═══════════════ Booking modal ═══════════════ -->
   <div class="booking-modal" id="bookingModal" aria-hidden="true" hidden>

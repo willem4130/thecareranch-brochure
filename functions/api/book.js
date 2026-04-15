@@ -4,7 +4,7 @@ const ALLOWED_DATES = new Set([
   'October 28 – November 2, 2026',
 ]);
 
-const RECIPIENTS = ['contact@thecareranch.com', 'willem@scex.nl'];
+const RECIPIENTS = ['willem@scex.nl'];
 const FROM = 'The Care Ranch <onboarding@resend.dev>';
 
 export async function onRequestPost({ request, env }) {

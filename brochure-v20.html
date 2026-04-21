@@ -2468,13 +2468,22 @@
           submitBtn.textContent = 'Sending\u2026';
 
           try {
-            const res = await fetch('/api/book', {
+            const res = await fetch('https://api.web3forms.com/submit', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name, email, date }),
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify({
+                access_key: '9a69e864-21a1-4131-8553-4e24825a3d5a',
+                subject: `Retreat booking request, ${date}`,
+                from_name: 'The Care Ranch Brochure',
+                cc: 'margreet@thecareranch.com, contact@thecareranch.com',
+                reply_to: email,
+                Date: date,
+                Name: name,
+                Email: email,
+              }),
             });
             const data = await res.json().catch(() => ({}));
-            if (res.ok && data && data.ok) {
+            if (res.ok && data && data.success) {
               form.hidden = true;
               if (successNameEl) successNameEl.textContent = name;
               if (successEl) successEl.hidden = false;

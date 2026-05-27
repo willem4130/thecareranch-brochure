@@ -110,7 +110,7 @@ Useful commands:
 GitHub repo operations use `gh` (authenticated as `willem4130`).
 
 ### Analytics
-Cloudflare Web Analytics beacon is in `<head>` of `brochure-v20.html` and `versions.html`. Token: `3f685f1f9c414ddf9bc305d40837a924`. View stats at Cloudflare dashboard → Analytics & Logs → Web Analytics → the entry tagged "JS Snippet installation" (NOT the Pages-managed ghost entries — see below).
+Cloudflare Web Analytics beacon is in `<head>` of `brochure-v20.html` and `versions.html` (after the GSAP CDN scripts, before `</head>`). Token: `3f685f1f9c414ddf9bc305d40837a924`. View stats at Cloudflare dashboard → Analytics & Logs → Web Analytics → the entry created via "Add a site" (the one without the blue "Manage this site using Cloudflare Pages" banner). Registered hostname: `thecareranch-brochure.pages.dev` only — if you ever wire a custom domain (e.g. `thecareranch.com`), add it to the Web Analytics site's hostname list in the same dashboard, otherwise visits to the new domain won't be counted.
 
 Why a manual snippet, not the Pages "Metrics → Enable" auto-injection: the auto-enable button on Pages projects is a known Cloudflare bug (throws `Error creating Web Analytics entry` and leaves orphaned Pages-linked sites with no installable snippet). Each click of Enable created a ghost entry. We added the site manually via the standalone Web Analytics → Add a site flow, choosing the "does not belong to Cloudflare websites" option to get a real installable token. New version files inherit the script tag automatically via the copy-from-previous-version workflow — do not remove it. There are 4 orphaned Pages-managed ghost entries in Web Analytics that can be deleted once the active site shows traffic.
 

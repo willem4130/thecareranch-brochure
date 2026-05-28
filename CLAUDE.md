@@ -17,6 +17,15 @@ Also contains the original v7 feedback and legacy .docx tooling from earlier rou
 ├── brochure-v11.html                # TCR brand font, scroll animations, PDF export
 ├── brochure-v12.html                # Inline SVG logo + word-by-word scroll reveal
 ├── brochure-v20.html                # Client feedback + type pass: kickers removed, hero tagline below hero, TCR pull-out scale, Arizona header removed, participant testimonials added (CURRENT)
+├── stats.html                       # Private analytics dashboard (passphrase-gated). See Deployment ▸ Stats dashboard
+├── functions/                       # Cloudflare Pages Functions — dashboard only (booking form is client-side)
+│   ├── _middleware.js               # Gates /stats, /stats.html, /api/stats behind a passphrase cookie
+│   ├── cfp_login.js                 # POST /cfp_login — passphrase check, sets auth cookie
+│   ├── constants.js                 # Cookie config + CFP_PROTECTED_PATHS list
+│   ├── template.js                  # Login page HTML (brochure palette)
+│   ├── utils.js                     # sha256 + cookie key/value helpers
+│   └── api/
+│       └── stats.js                 # Queries Cloudflare GraphQL Analytics API → JSON for the dashboard
 ├── images/                          # Photos extracted from client PDFs
 │   ├── location-51.jpg              # Pool → Experience section
 │   ├── location-92.jpg              # Entrance gate → Hero background

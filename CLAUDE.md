@@ -114,6 +114,15 @@ Cloudflare Web Analytics beacon is in `<head>` of `brochure-v20.html` and `versi
 
 Why a manual snippet, not the Pages "Metrics → Enable" auto-injection: the auto-enable button on Pages projects is a known Cloudflare bug (throws `Error creating Web Analytics entry` and leaves orphaned Pages-linked sites with no installable snippet). Each click of Enable created a ghost entry. We added the site manually via the standalone Web Analytics → Add a site flow, choosing the "does not belong to Cloudflare websites" option to get a real installable token. New version files inherit the script tag automatically via the copy-from-previous-version workflow — do not remove it. There are 4 orphaned Pages-managed ghost entries in Web Analytics that can be deleted once the active site shows traffic.
 
+### Stats dashboard (`/stats`)
+Self-hosted analytics dashboard at https://thecareranch-brochure.pages.dev/stats so the client can view traffic without a Cloudflare login. Shows visit counters (1h / 24h / 30d), a 30-day daily-visits line chart, and top pages / countries / referrers / devices. Built 2026-05-28.
+
+- **Data path:** `functions/api/stats.js` (Cloudflare Pages Function) queries the Cloudflare GraphQL Analytics API (`rumPageloadEventsAdaptiveGroups`) server-side using the Web Analytics site tag, then `stats.html` renders it with Chart.js (CDN). The site tag is the same Web Analytics token as the beacon.
+- **Auth:** passphrase + hashed cookie (Charca pattern). `functions/_middleware.js` gates ONLY `/stats`, `/stats.html`, `/api/stats` (see `functions/constants.js` `CFP_PROTECTED_PATHS`); the brochure stays fully public. Cookie = `sha256(passphrase)`, 30-day Max-Age, HttpOnly/Secure/SameSite=Lax. Login page is `functions/template.js`, POST handler `functions/cfp_login.js`.
+- **The passphrase is NOT in this repo** — the GitHub repo is public, so committing it would defeat the lock. It lives in Claude's private local memory (`~/.claude/.../memory/reference_stats_dashboard.md`). Ask Claude, or reset it via the secret below.
+- **Secrets (Cloudflare Pages, set via `npx wrangler pages secret put <KEY> --project-name=thecareranch-brochure`):** `CF_API_TOKEN` (scope Account → Account Analytics → Read), `CF_ACCOUNT_TAG` (`0745922372e40f12bc9826b1079af208`), `CFP_PASSWORD` (the dashboard passphrase). To change the passphrase: set a new `CFP_PASSWORD` and update the memory file.
+- These Pages Functions are unrelated to the booking form, which is client-side only (the old `functions/api/book.js` was removed 2026-04-21; this is the first server-side function since).
+
 ## Booking form + email
 
 The "Book now" button opens a modal form in `brochure-v20.html`. On submit, the form POSTs JSON **directly to Web3Forms** from the browser. There is no server-side function in the booking path — `functions/api/book.js` was removed on 2026-04-21.

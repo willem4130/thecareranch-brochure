@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>The Care Ranch, Stats</title>
+    <style>
+      :root {
+        --sand: #F7F4F0;
+        --cream: #F2EDE4;
+        --terracotta: #C47D5C;
+        --terracotta-dim: rgba(196, 125, 92, 0.18);
+        --saddle: #79584A;
+        --charcoal: #3D3632;
+        --muted: rgba(61, 54, 50, 0.6);
+        --border: rgba(121, 88, 74, 0.12);
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: Arial, sans-serif;
+        background: var(--sand);
+        color: var(--charcoal);
+        line-height: 1.5;
+        padding: 2rem 1.5rem 4rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.2rem;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(61, 54, 50, 0.85);
+      }
+      header .meta { font-size: 0.8rem; color: var(--muted); }
+      header .meta a {
+        color: var(--terracotta);
+        text-decoration: none;
+        margin-left: 1rem;
+      }
+      header .meta a:hover { text-decoration: underline; }
+
+      .counters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .counter {
+        background: #fff;
+        padding: 1.25rem 1.5rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+      }
+      .counter .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+      }
+      .counter .num {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--saddle);
+        line-height: 1;
+      }
+      .counter .sub {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 0.3rem;
+      }
+
+      .chart-card {
+        background: #fff;
+        padding: 1.5rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        margin-bottom: 2rem;
+      }
+      .chart-card h2 {
+        margin: 0 0 1rem;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--saddle);
+        font-weight: 600;
+      }
+      .chart-wrap { position: relative; height: 280px; }
+
+      .tables {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+      }
+      .table-card {
+        background: #fff;
+        padding: 1.25rem 1.5rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+      }
+      .table-card h2 {
+        margin: 0 0 0.8rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--saddle);
+        font-weight: 600;
+      }
+      table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+      td { padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+      td.label-cell {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      td.num-cell { text-align: right; font-variant-numeric: tabular-nums; color: var(--saddle); font-weight: 600; }
+      tr:last-child td { border-bottom: none; }
+      .empty { color: var(--muted); font-size: 0.85rem; padding: 0.5rem 0; }
+
+      .status {
+        background: #fff;
+        border: 1px solid var(--border);
+        padding: 1.5rem;
+        border-radius: 6px;
+        color: var(--muted);
+      }
+      .status.error {
+        color: var(--terracotta);
+        background: var(--terracotta-dim);
+        border-color: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>The Care Ranch, Stats</h1>
+      <div class="meta">
+        <span id="updated"></span>
+        <a href="/versions.html">Brochure versions</a>
+      </div>
+    </header>
+
+    <div id="root">
+      <p class="status" id="status">Loading dashboard…</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+      const COLOR = {
+        terracotta: '#C47D5C',
+        terracottaDim: 'rgba(196, 125, 92, 0.18)',
+        saddle: '#79584A',
+        charcoal: '#3D3632',
+        muted: 'rgba(61, 54, 50, 0.6)',
+        border: 'rgba(121, 88, 74, 0.12)',
+      };
+
+      function fmt(n) {
+        return new Intl.NumberFormat('en-US').format(n || 0);
+      }
+
+      function renderError(msg) {
+        document.getElementById('root').innerHTML =
+          `<p class="status error">Could not load stats: ${msg}</p>`;
+      }
+
+      function renderTable(rows, labelKey, fallback) {
+        if (!rows || rows.length === 0) {
+          return `<p class="empty">No data in the last 30 days.</p>`;
+        }
+        return `<table>${rows
+          .map(
+            (r) =>
+              `<tr><td class="label-cell" title="${r[labelKey] || fallback}">${
+                r[labelKey] || fallback
+              }</td><td class="num-cell">${fmt(r.visits)}</td></tr>`
+          )
+          .join('')}</table>`;
+      }
+
+      function render(data) {
+        const updatedAt = new Date(data.generated_at);
+        document.getElementById('updated').textContent =
+          'Updated ' + updatedAt.toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+
+        document.getElementById('root').innerHTML = `
+          <div class="counters">
+            <div class="counter">
+              <div class="label">Last hour</div>
+              <div class="num">${fmt(data.visits_1h)}</div>
+              <div class="sub">${fmt(data.pageviews_1h)} page views</div>
+            </div>
+            <div class="counter">
+              <div class="label">Last 24 hours</div>
+              <div class="num">${fmt(data.visits_24h)}</div>
+              <div class="sub">${fmt(data.pageviews_24h)} page views</div>
+            </div>
+            <div class="counter">
+              <div class="label">Last 30 days</div>
+              <div class="num">${fmt(data.visits_30d)}</div>
+              <div class="sub">${fmt(data.pageviews_30d)} page views</div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h2>Daily visits, last 30 days</h2>
+            <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
+          </div>
+
+          <div class="tables">
+            <div class="table-card">
+              <h2>Top pages</h2>
+              ${renderTable(data.topPages, 'path', '/')}
+            </div>
+            <div class="table-card">
+              <h2>Top countries</h2>
+              ${renderTable(data.topCountries, 'country', 'Unknown')}
+            </div>
+            <div class="table-card">
+              <h2>Top referrers</h2>
+              ${renderTable(data.topReferrers, 'referrer', 'Direct')}
+            </div>
+            <div class="table-card">
+              <h2>Devices</h2>
+              ${renderTable(data.topDevices, 'device', 'Unknown')}
+            </div>
+          </div>
+        `;
+
+        const ctx = document.getElementById('dailyChart');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.daily.map((d) => d.date),
+            datasets: [
+              {
+                label: 'Visits',
+                data: data.daily.map((d) => d.visits),
+                borderColor: COLOR.terracotta,
+                backgroundColor: COLOR.terracottaDim,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: COLOR.terracotta,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: COLOR.muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: COLOR.border },
+                ticks: { color: COLOR.muted, precision: 0 },
+              },
+            },
+          },
+        });
+      }
+
+      fetch('/api/stats', { credentials: 'same-origin' })
+        .then(async (res) => {
+          if (!res.ok) {
+            const body = await res.text();
+            let msg;
+            try { msg = JSON.parse(body).error || body; } catch { msg = body; }
+            throw new Error(msg || `HTTP ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(render)
+        .catch((err) => renderError(err.message || 'Unknown error'));
+    </script>
+  </body>
+</html>

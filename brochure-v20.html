@@ -1374,6 +1374,19 @@
         text-transform: none;
         letter-spacing: normal;
       }
+
+      /* Mobile readability: testimonial quote bodies drop the TCR cursive
+         italic for plain Arial, matching the other section body text (client
+         request). The TCR cursive lowercase is hard to read across these
+         multi-sentence quotes on a narrow screen. MOBILE ONLY (≤767px) and
+         the quote body ONLY: .testimonial-name keeps its terracotta TCR-caps
+         attribution accent, .testimonial-role is already Arial. Size/color/
+         line-height inherit from the base rule. Desktop + tablet keep the
+         sanctioned TCR cursive (see CLAUDE.md). */
+      .testimonial-quote {
+        font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+        font-style: normal;
+      }
     }
 
     @media (max-width: 520px) {
